@@ -2,6 +2,8 @@ import { ObjectId } from 'mongodb';
 
 export interface User {
     _id?: ObjectId;
+    user_id: string;        // ID user (unique identifier)
+    name: string;           // User's full name
     email: string;
     password_hash: string;
     role: 'user' | 'officer';

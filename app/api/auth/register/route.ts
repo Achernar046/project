@@ -6,12 +6,12 @@ import { User, Wallet } from '@/models/types';
 
 export async function POST(request: NextRequest) {
     try {
-        const { email, password, role = 'user' } = await request.json();
+        const { user_id, name, email, password, role = 'user' } = await request.json();
 
         // Validate input
-        if (!email || !password) {
+        if (!user_id || !name || !email || !password) {
             return NextResponse.json(
-                { error: 'Email and password are required' },
+                { error: 'ID User, Name, Email and Password are required' },
                 { status: 400 }
             );
         }
@@ -34,11 +34,20 @@ export async function POST(request: NextRequest) {
 
         const db = await getDatabase();
 
-        // Check if user already exists
+        // Check if user_id already exists
+        const existingUserId = await db.collection<User>('users').findOne({ user_id });
+        if (existingUserId) {
+            return NextResponse.json(
+                { error: 'User ID already exists' },
+                { status: 409 }
+            );
+        }
+
+        // Check if email already exists
         const existingUser = await db.collection<User>('users').findOne({ email });
         if (existingUser) {
             return NextResponse.json(
-                { error: 'User already exists' },
+                { error: 'Email already exists' },
                 { status: 409 }
             );
         }
@@ -52,6 +61,8 @@ export async function POST(request: NextRequest) {
 
         // Create user
         const user: User = {
+            user_id,
+            name,
             email,
             password_hash,
             role: role as 'user' | 'officer',
@@ -87,6 +98,8 @@ export async function POST(request: NextRequest) {
                 token,
                 user: {
                     id: userResult.insertedId,
+                    userId: user.user_id,
+                    name: user.name,
                     email: user.email,
                     role: user.role,
                     walletAddress: user.wallet_address,

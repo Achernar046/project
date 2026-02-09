@@ -6,6 +6,8 @@ import styles from './auth.module.css';
 
 export default function AuthPage() {
     const [mode, setMode] = useState<'login' | 'register'>('login');
+    const [userId, setUserId] = useState('');
+    const [name, setName] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [role, setRole] = useState<'user' | 'officer'>('user');
@@ -22,7 +24,7 @@ export default function AuthPage() {
             const endpoint = mode === 'login' ? '/api/auth/login' : '/api/auth/register';
             const body = mode === 'login'
                 ? { email, password }
-                : { email, password, role };
+                : { user_id: userId, name, email, password, role };
 
             const response = await fetch(endpoint, {
                 method: 'POST',
@@ -81,6 +83,34 @@ export default function AuthPage() {
                 </div>
 
                 <form onSubmit={handleSubmit} className={styles.form}>
+                    {mode === 'register' && (
+                        <>
+                            <div className="form-group">
+                                <label className="form-label">ID User</label>
+                                <input
+                                    type="text"
+                                    className="form-input"
+                                    value={userId}
+                                    onChange={(e) => setUserId(e.target.value)}
+                                    required
+                                    placeholder="e.g., USER001"
+                                />
+                            </div>
+
+                            <div className="form-group">
+                                <label className="form-label">Name</label>
+                                <input
+                                    type="text"
+                                    className="form-input"
+                                    value={name}
+                                    onChange={(e) => setName(e.target.value)}
+                                    required
+                                    placeholder="Your full name"
+                                />
+                            </div>
+                        </>
+                    )}
+
                     <div className="form-group">
                         <label className="form-label">Email</label>
                         <input
