@@ -6,6 +6,8 @@ import styles from './officer.module.css';
 
 interface User {
     id: string;
+    userId: string;
+    name: string;
     email: string;
     walletAddress: string;
     createdAt: Date;
@@ -143,7 +145,7 @@ export default function OfficerDashboard() {
                                         <option value="">-- Select a user --</option>
                                         {users.map((user) => (
                                             <option key={user.id} value={user.id}>
-                                                {user.email} ({user.walletAddress.slice(0, 10)}...)
+                                                {user.userId} - {user.name}
                                             </option>
                                         ))}
                                     </select>
@@ -191,7 +193,9 @@ export default function OfficerDashboard() {
                         <div className={styles.userGrid}>
                             {users.map((user) => (
                                 <div key={user.id} className={`card ${styles.userCard}`}>
-                                    <h3>{user.email}</h3>
+                                    <h3>{user.userId}</h3>
+                                    <p><strong>Name:</strong> {user.name}</p>
+                                    <p><strong>Email:</strong> {user.email}</p>
                                     <p>
                                         <strong>Wallet:</strong>{' '}
                                         <code>{user.walletAddress.slice(0, 10)}...{user.walletAddress.slice(-8)}</code>

@@ -39,6 +39,8 @@ export async function GET(request: NextRequest) {
             .find({ role: 'user' })
             .project({
                 _id: 1,
+                user_id: 1,
+                name: 1,
                 email: 1,
                 wallet_address: 1,
                 created_at: 1,
@@ -50,6 +52,8 @@ export async function GET(request: NextRequest) {
             {
                 users: users.map((user) => ({
                     id: user._id?.toString(),
+                    userId: user.user_id,
+                    name: user.name,
                     email: user.email,
                     walletAddress: user.wallet_address,
                     createdAt: user.created_at,
