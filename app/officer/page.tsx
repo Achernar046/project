@@ -4,24 +4,22 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import styles from './officer.module.css';
 
-interface Submission {
-    _id: string;
-    waste_type: string;
-    weight_kg: number;
-    description?: string;
-    created_at: string;
-    user: {
-        email: string;
-        wallet_address: string;
-    };
+interface User {
+    id: string;
+    email: string;
+    walletAddress: string;
+    createdAt: Date;
 }
 
 export default function OfficerDashboard() {
     const router = useRouter();
     const [user, setUser] = useState<any>(null);
-    const [submissions, setSubmissions] = useState<Submission[]>([]);
+    const [users, setUsers] = useState<User[]>([]);
     const [loading, setLoading] = useState(true);
-    const [processing, setProcessing] = useState<string | null>(null);
+    const [selectedUserId, setSelectedUserId] = useState('');
+    const [coinAmount, setCoinAmount] = useState('');
+    const [processing, setProcessing] = useState(false);
+    const [message, setMessage] = useState('');
 
     useEffect(() => {
         const token = localStorage.getItem('token');
@@ -39,39 +37,47 @@ export default function OfficerDashboard() {
         }
 
         setUser(parsedUser);
-        fetchPendingSubmissions(token);
+        fetchUsers(token);
     }, [router]);
 
-    const fetchPendingSubmissions = async (token: string) => {
+    const fetchUsers = async (token: string) => {
         try {
-            const response = await fetch('/api/waste/pending', {
+            const response = await fetch('/api/users/list', {
                 headers: { Authorization: `Bearer ${token}` },
             });
             const data = await response.json();
             if (response.ok) {
-                setSubmissions(data.submissions);
+                setUsers(data.users);
             }
         } catch (error) {
-            console.error('Failed to fetch submissions:', error);
+            console.error('Failed to fetch users:', error);
         } finally {
             setLoading(false);
         }
     };
 
-    const handleApprove = async (submissionId: string, coinAmount: number) => {
-        setProcessing(submissionId);
+    const handleAddCoins = async (e: React.FormEvent) => {
+        e.preventDefault();
+
+        if (!selectedUserId || !coinAmount) {
+            setMessage('❌ Please select a user and enter amount');
+            return;
+        }
+
+        setProcessing(true);
+        setMessage('');
 
         try {
             const token = localStorage.getItem('token');
-            const response = await fetch('/api/waste/approve', {
+            const response = await fetch('/api/officer/add-coins', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                     Authorization: `Bearer ${token}`,
                 },
                 body: JSON.stringify({
-                    submission_id: submissionId,
-                    coin_amount: coinAmount,
+                    user_id: selectedUserId,
+                    amount: parseFloat(coinAmount),
                 }),
             });
 
@@ -81,27 +87,14 @@ export default function OfficerDashboard() {
                 throw new Error(data.error);
             }
 
-            alert(`✅ Approved! ${coinAmount} WST minted.\nTx: ${data.txHash}`);
-
-            // Refresh submissions
-            fetchPendingSubmissions(token!);
+            setMessage(`✅ Successfully added ${coinAmount} WST to ${data.transaction.user}`);
+            setCoinAmount('');
+            setSelectedUserId('');
         } catch (error: any) {
-            alert('❌ Error: ' + error.message);
+            setMessage('❌ ' + error.message);
         } finally {
-            setProcessing(null);
+            setProcessing(false);
         }
-    };
-
-    const calculateCoins = (wasteType: string, weight: number): number => {
-        const rates: Record<string, number> = {
-            plastic: 2,
-            paper: 1,
-            metal: 5,
-            glass: 3,
-            organic: 1,
-            electronic: 10,
-        };
-        return (rates[wasteType] || 1) * weight;
     };
 
     const handleLogout = () => {
@@ -129,69 +122,86 @@ export default function OfficerDashboard() {
                 <div className="container">
                     <div className={styles.stats}>
                         <div className="card">
-                            <h3>Pending Submissions</h3>
-                            <div className={styles.statNumber}>{submissions.length}</div>
+                            <h3>Total Users</h3>
+                            <div className={styles.statNumber}>{users.length}</div>
                         </div>
                     </div>
 
-                    <h2 className={styles.sectionTitle}>Review Submissions</h2>
+                    <h2 className={styles.sectionTitle}>Add Coins to User</h2>
 
-                    {submissions.length === 0 ? (
+                    <div className={styles.addCoinsSection}>
+                        <div className="card">
+                            <form onSubmit={handleAddCoins}>
+                                <div className="form-group">
+                                    <label className="form-label">Select User</label>
+                                    <select
+                                        className="form-select"
+                                        value={selectedUserId}
+                                        onChange={(e) => setSelectedUserId(e.target.value)}
+                                        required
+                                    >
+                                        <option value="">-- Select a user --</option>
+                                        {users.map((user) => (
+                                            <option key={user.id} value={user.id}>
+                                                {user.email} ({user.walletAddress.slice(0, 10)}...)
+                                            </option>
+                                        ))}
+                                    </select>
+                                </div>
+
+                                <div className="form-group">
+                                    <label className="form-label">Coin Amount (WST)</label>
+                                    <input
+                                        type="number"
+                                        className="form-input"
+                                        value={coinAmount}
+                                        onChange={(e) => setCoinAmount(e.target.value)}
+                                        min="0.1"
+                                        step="0.1"
+                                        placeholder="e.g., 100"
+                                        required
+                                    />
+                                </div>
+
+                                {message && (
+                                    <div className={message.startsWith('✅') ? styles.success : styles.error}>
+                                        {message}
+                                    </div>
+                                )}
+
+                                <button
+                                    type="submit"
+                                    className="btn btn-secondary"
+                                    disabled={processing}
+                                    style={{ width: '100%' }}
+                                >
+                                    {processing ? 'Adding Coins...' : 'Add Coins'}
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+
+                    <h2 className={styles.sectionTitle}>User List</h2>
+
+                    {users.length === 0 ? (
                         <div className="card text-center">
-                            <p>No pending submissions at the moment.</p>
+                            <p>No users registered yet.</p>
                         </div>
                     ) : (
-                        <div className={styles.submissionsGrid}>
-                            {submissions.map((submission) => {
-                                const suggestedCoins = calculateCoins(
-                                    submission.waste_type,
-                                    submission.weight_kg
-                                );
-
-                                return (
-                                    <div key={submission._id} className={`card ${styles.submissionCard}`}>
-                                        <div className={styles.submissionHeader}>
-                                            <h3>{submission.waste_type.toUpperCase()}</h3>
-                                            <span className={styles.badge}>{submission.weight_kg} kg</span>
-                                        </div>
-
-                                        <div className={styles.submissionDetails}>
-                                            <p>
-                                                <strong>User:</strong> {submission.user.email}
-                                            </p>
-                                            <p>
-                                                <strong>Wallet:</strong>{' '}
-                                                <code>{submission.user.wallet_address.slice(0, 10)}...</code>
-                                            </p>
-                                            {submission.description && (
-                                                <p>
-                                                    <strong>Description:</strong> {submission.description}
-                                                </p>
-                                            )}
-                                            <p>
-                                                <strong>Submitted:</strong>{' '}
-                                                {new Date(submission.created_at).toLocaleString()}
-                                            </p>
-                                        </div>
-
-                                        <div className={styles.approvalSection}>
-                                            <div className={styles.coinSuggestion}>
-                                                Suggested: <strong>{suggestedCoins} WST</strong>
-                                            </div>
-                                            <button
-                                                className="btn btn-secondary"
-                                                onClick={() => handleApprove(submission._id, suggestedCoins)}
-                                                disabled={processing === submission._id}
-                                                style={{ width: '100%' }}
-                                            >
-                                                {processing === submission._id
-                                                    ? 'Processing...'
-                                                    : `Approve & Mint ${suggestedCoins} WST`}
-                                            </button>
-                                        </div>
-                                    </div>
-                                );
-                            })}
+                        <div className={styles.userGrid}>
+                            {users.map((user) => (
+                                <div key={user.id} className={`card ${styles.userCard}`}>
+                                    <h3>{user.email}</h3>
+                                    <p>
+                                        <strong>Wallet:</strong>{' '}
+                                        <code>{user.walletAddress.slice(0, 10)}...{user.walletAddress.slice(-8)}</code>
+                                    </p>
+                                    <p>
+                                        <strong>Joined:</strong>{' '}
+                                        {new Date(user.createdAt).toLocaleDateString()}
+                                    </p>
+                                </div>
+                            ))}
                         </div>
                     )}
                 </div>

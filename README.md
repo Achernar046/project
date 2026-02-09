@@ -1,253 +1,209 @@
-# WasteCoin - Waste-to-Blockchain Rewards System
+# WasteCoin - Digital Reward System
 
-A full-stack Web3 application that incentivizes waste management by converting waste submissions into blockchain-based coins (WasteCoin/WST) on the Sepolia testnet.
+A simplified blockchain-based application where officers can reward users with WasteCoin (WST) tokens.
 
-## 🌟 Features
-
-- **User Registration & Auto Wallet Creation**: Users get an Ethereum wallet automatically upon registration
-- **Waste Submission**: Submit waste with type, weight, and description
-- **Officer Verification**: Human-in-the-loop approval system for waste submissions
-- **Blockchain Rewards**: Earn WST tokens minted on Sepolia testnet
-- **Secure Authentication**: Custom JWT-based authentication with bcrypt password hashing
-- **Encrypted Wallets**: Private keys encrypted with AES-256 and stored securely
-- **Modern UI**: Glassmorphism design with gradients and animations
-
-## 🛠️ Tech Stack
-
-### Frontend
-- Next.js 14+ with TypeScript
-- React 19
-- Vanilla CSS with CSS variables
-- Inter font from Google Fonts
-
-### Backend
-- Next.js API Routes
-- MongoDB Atlas for database
-- Custom JWT authentication
-- bcryptjs for password hashing
-
-### Blockchain
-- Solidity 0.8.20 (ERC20 smart contract)
-- Ethers.js v6
-- Sepolia Testnet
-- Hardhat for development
-
-## 📋 Prerequisites
-
-1. **Node.js** (v18 or higher)
-2. **MongoDB Atlas** account and cluster
-3. **Sepolia Testnet** RPC URL (Infura or Alchemy)
-4. **Sepolia ETH** for deploying contract and minting coins
-
-## 🚀 Setup Instructions
-
-### 1. Install Dependencies
-
-```bash
-npm install
-```
-
-### 2. Environment Configuration
-
-Copy `.env.example` to `.env.local`:
-
-```bash
-cp .env.example .env.local
-```
-
-Fill in the following variables in `.env.local`:
-
-```env
-# MongoDB Atlas connection string
-MONGODB_URI=mongodb+srv://username:password@cluster.mongodb.net/waste-coin-db
-
-# JWT Secret (generate a random string)
-JWT_SECRET=your-super-secret-jwt-key
-
-# Encryption Secret (generate a 32-byte hex string)
-ENCRYPTION_SECRET=your-32-byte-hex-encryption-key
-
-# Sepolia RPC URL (get from Infura or Alchemy)
-SEPOLIA_RPC_URL=https://sepolia.infura.io/v3/YOUR_PROJECT_ID
-
-# Officer wallet private key (needs Sepolia ETH)
-OFFICER_PRIVATE_KEY=0x...
-
-# Contract address (fill after deployment)
-WASTE_COIN_CONTRACT_ADDRESS=
-
-# App URL
-NEXT_PUBLIC_APP_URL=http://localhost:3000
-```
-
-### 3. Get Sepolia ETH
-
-1. Create a wallet or use an existing one
-2. Get free Sepolia ETH from faucets:
-   - https://sepoliafaucet.com/
-   - https://www.infura.io/faucet/sepolia
-3. Use this wallet's private key as `OFFICER_PRIVATE_KEY`
-
-### 4. Deploy Smart Contract
-
-Compile the contract:
-```bash
-npm run compile
-```
-
-Deploy to Sepolia:
-```bash
-npm run deploy:sepolia
-```
-
-Copy the contract address from the output and add it to `.env.local`:
-```env
-WASTE_COIN_CONTRACT_ADDRESS=0x...
-```
-
-### 5. Run the Application
-
-Development mode:
-```bash
-npm run dev
-```
-
-Open http://localhost:3000 in your browser.
-
-## 📖 Usage Guide
+## Features
 
 ### For Users
-
-1. **Register**: Go to `/auth` and create an account (role: User)
-2. **Auto Wallet**: A wallet is created automatically for you
-3. **Submit Waste**: Go to dashboard and submit waste details
-4. **Wait for Approval**: An officer will review your submission
-5. **Receive Coins**: WST tokens are minted to your wallet
+- 👁️ **View Balance** - Check your WasteCoin balance in real-time
+- 🔐 **Secure Wallet** - Automatic Ethereum wallet generation
+- 📊 **Simple Dashboard** - Clean interface showing your coin balance
 
 ### For Officers
+- 👥 **User Management** - View all registered users
+- 💰 **Add Coins** - Directly reward users with coins
+- 📈 **Track Activity** - Monitor total users in the system
 
-1. **Register**: Create an account with role: Officer
-2. **Review Submissions**: See all pending waste submissions
-3. **Approve**: Click approve to mint coins to users
-4. **Blockchain Transaction**: Coins are minted via smart contract
+## Tech Stack
 
-## 🏗️ Project Structure
+- **Frontend**: Next.js 16 (React 19, TypeScript)
+- **Backend**: Next.js API Routes
+- **Database**: MongoDB Atlas
+- **Authentication**: JWT (JSON Web Tokens)
+- **Blockchain**: Ethereum (Sepolia Testnet) - Optional
+- **Styling**: CSS Modules
+
+## Prerequisites
+
+- Node.js 18+ 
+- MongoDB Atlas account
+- npm or yarn
+
+## Installation
+
+1. **Clone the repository**
+   ```bash
+   git clone <repository-url>
+   cd project1
+   ```
+
+2. **Install dependencies**
+   ```bash
+   npm install
+   ```
+
+3. **Configure environment variables**
+   
+   Copy `.env.example` to `.env.local` and update:
+   ```bash
+   cp .env.example .env.local
+   ```
+
+   Required variables:
+   ```env
+   # MongoDB Atlas
+   MONGODB_URI=mongodb+srv://username:password@cluster.mongodb.net/waste-coin-db?retryWrites=true&w=majority
+
+   # JWT Secret (generate a random string)
+   JWT_SECRET=your-super-secret-jwt-key-change-this
+
+   # Encryption Secret (32-byte hex string)
+   ENCRYPTION_SECRET=0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef
+
+   # Next.js
+   NEXT_PUBLIC_APP_URL=http://localhost:3000
+   ```
+
+4. **Set up MongoDB Atlas**
+   - Create a cluster at [MongoDB Atlas](https://cloud.mongodb.com/)
+   - Create a database user
+   - Add your IP to Network Access (or allow 0.0.0.0/0 for development)
+   - Copy the connection string to `MONGODB_URI`
+
+5. **Run the development server**
+   ```bash
+   npm run dev
+   ```
+
+   Open [http://localhost:3000](http://localhost:3000)
+
+## Usage
+
+### Register as User
+1. Go to http://localhost:3000/auth
+2. Fill in email and password
+3. Select **"User (Submit Waste)"** role
+4. Click "Create Account"
+5. You'll be redirected to `/dashboard` showing your balance
+
+### Register as Officer
+1. Go to http://localhost:3000/auth
+2. Fill in email and password
+3. Select **"Officer (Approve Waste)"** role
+4. Click "Create Account"
+5. You'll be redirected to `/officer` dashboard
+
+### Add Coins (Officer Only)
+1. Login as officer
+2. Select a user from the dropdown
+3. Enter coin amount
+4. Click "Add Coins"
+5. User's balance will be updated immediately
+
+## Project Structure
 
 ```
 project1/
 ├── app/
-│   ├── api/
-│   │   ├── auth/
-│   │   │   ├── register/route.ts
-│   │   │   └── login/route.ts
-│   │   ├── waste/
-│   │   │   ├── submit/route.ts
-│   │   │   ├── pending/route.ts
-│   │   │   └── approve/route.ts
-│   │   ├── wallet/
-│   │   │   └── balance/route.ts
-│   │   └── transactions/
-│   │       └── history/route.ts
-│   ├── auth/
-│   │   └── page.tsx
-│   ├── dashboard/
-│   │   └── page.tsx
-│   ├── officer/
-│   │   └── page.tsx
-│   ├── layout.tsx
-│   ├── page.tsx
-│   └── globals.css
-├── contracts/
-│   └── WasteCoin.sol
+│   ├── api/              # API routes
+│   │   ├── auth/         # Authentication endpoints
+│   │   ├── officer/      # Officer-only endpoints
+│   │   ├── users/        # User management
+│   │   └── wallet/       # Balance queries
+│   ├── auth/             # Auth page
+│   ├── dashboard/        # User dashboard
+│   └── officer/          # Officer dashboard
 ├── lib/
-│   ├── mongodb.ts
-│   ├── auth.ts
-│   ├── wallet.ts
-│   ├── blockchain.ts
-│   └── auth-middleware.ts
+│   ├── auth.ts           # JWT utilities
+│   ├── mongodb.ts        # Database connection
+│   └── wallet.ts         # Wallet generation
 ├── models/
-│   └── types.ts
-├── scripts/
-│   └── deploy.js
-├── hardhat.config.js
-├── next.config.js
-├── tsconfig.json
-└── package.json
+│   └── types.ts          # TypeScript interfaces
+└── .env.local            # Environment variables
 ```
 
-## 🔐 Security Features
+## Database Collections
 
-- **Password Hashing**: bcrypt with salt rounds
-- **JWT Tokens**: Secure token-based authentication
-- **Private Key Encryption**: AES-256 encryption for wallet keys
-- **Role-Based Access**: User and Officer roles with middleware
-- **Environment Variables**: Sensitive data in .env files
+### `users`
+Stores user accounts with email, password hash, role, and wallet address.
 
-## 🪙 Coin Calculation
+### `wallets`
+Stores encrypted private keys for user wallets.
 
-Default rates (coins per kg):
-- Plastic: 2 WST/kg
-- Paper: 1 WST/kg
-- Metal: 5 WST/kg
-- Glass: 3 WST/kg
-- Organic: 1 WST/kg
-- Electronic: 10 WST/kg
+### `transactions`
+Records all coin transactions (mint, transfer, exchange).
 
-## 📊 Database Collections
+## API Endpoints
 
-### users
-- email, password_hash, role, wallet_address
+| Method | Endpoint | Auth | Description |
+|--------|----------|------|-------------|
+| POST | `/api/auth/register` | Public | Register new user |
+| POST | `/api/auth/login` | Public | Login user |
+| GET | `/api/wallet/balance` | User | Get coin balance |
+| GET | `/api/users/list` | Officer | Get all users |
+| POST | `/api/officer/add-coins` | Officer | Add coins to user |
 
-### wallets
-- user_id, address, encrypted_private_key, encryption_iv
+## Security Features
 
-### waste_submissions
-- user_id, waste_type, weight_kg, status, coin_amount, blockchain_tx_hash
+- ✅ Password hashing with bcrypt
+- ✅ JWT-based authentication
+- ✅ Role-based access control
+- ✅ Encrypted private key storage
+- ✅ Input validation
+- ✅ MongoDB injection protection
 
-### transactions
-- user_id, type, amount, blockchain_tx_hash, status
+## Development
 
-## 🔗 Blockchain Explorer
-
-View transactions on Sepolia Etherscan:
-```
-https://sepolia.etherscan.io/address/YOUR_CONTRACT_ADDRESS
+### Run development server
+```bash
+npm run dev
 ```
 
-## 🐛 Troubleshooting
+### Build for production
+```bash
+npm run build
+npm start
+```
 
-### Contract deployment fails
-- Ensure you have enough Sepolia ETH
-- Check RPC URL is correct
-- Verify private key format (should start with 0x)
+### Lint code
+```bash
+npm run lint
+```
 
-### MongoDB connection error
-- Check connection string format
-- Verify network access in MongoDB Atlas
-- Ensure database user has correct permissions
+## Troubleshooting
 
-### JWT errors
-- Verify JWT_SECRET is set
-- Check token expiration
+### MongoDB Connection Error
+- Check your MongoDB Atlas credentials
+- Verify IP whitelist in Network Access
+- Ensure connection string includes database name
+
+### Balance Not Updating
+- Refresh the page
+- Check if transaction was created in MongoDB
+- Verify officer added coins successfully
+
+### Authentication Issues
 - Clear localStorage and login again
+- Check JWT_SECRET in `.env.local`
+- Verify token expiration
 
-## 📝 License
+## Future Enhancements
+
+- [ ] Deploy smart contract to Sepolia testnet
+- [ ] Integrate blockchain transactions
+- [ ] Add transaction history page
+- [ ] Implement coin transfer between users
+- [ ] Add email notifications
+- [ ] Create admin panel for system management
+
+## License
 
 MIT
 
-## 👥 Roles
+## Support
 
-- **User**: Submit waste and earn coins
-- **Officer**: Review and approve submissions
-
-## 🌐 Deployment
-
-For production deployment:
-1. Deploy smart contract to mainnet or Polygon
-2. Update environment variables
-3. Deploy Next.js app to Vercel/Netlify
-4. Configure MongoDB production cluster
+For issues or questions, please open an issue in the repository.
 
 ---
 
-Built with ❤️ for a sustainable future
+**Built with ❤️ using Next.js and MongoDB**

@@ -10,8 +10,15 @@ const nextConfig = {
         };
         return config;
     },
+    // Add empty turbopack config to silence Turbopack error
+    turbopack: {},
     images: {
-        domains: ['localhost'],
+        remotePatterns: [
+            {
+                protocol: 'http',
+                hostname: 'localhost',
+            },
+        ],
     },
 };
 
