@@ -1,4 +1,8 @@
 import { MongoClient, Db } from 'mongodb';
+import { promises as dns } from 'dns';
+
+// Configure DNS to use Google DNS servers for better MongoDB Atlas connectivity
+dns.setServers(['8.8.8.8', '8.8.4.4', '1.1.1.1']);
 
 if (!process.env.MONGODB_URI) {
     throw new Error('Please add your MongoDB URI to .env.local');
@@ -8,6 +12,8 @@ const uri = process.env.MONGODB_URI;
 const options = {
     retryWrites: true,
     w: 'majority' as const,
+    connectTimeoutMS: 30000,
+    serverSelectionTimeoutMS: 30000,
 };
 
 let client: MongoClient;
