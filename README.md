@@ -1,209 +1,323 @@
-# WasteCoin - Digital Reward System
+# WasteCoin - ระบบรางวัลดิจิทัล
 
-A simplified blockchain-based application where officers can reward users with WasteCoin (WST) tokens.
+แอปพลิเคชันที่ใช้ blockchain โดยเจ้าหน้าที่สามารถมอบเหรียญ WasteCoin (WST) ให้กับผู้ใช้เป็นรางวัล
 
-## Features
+## คุณสมบัติหลัก
 
-### For Users
-- 👁️ **View Balance** - Check your WasteCoin balance in real-time
-- 🔐 **Secure Wallet** - Automatic Ethereum wallet generation
-- 📊 **Simple Dashboard** - Clean interface showing your coin balance
+### สำหรับผู้ใช้ทั่วไป
+- 👁️ **ดูยอดเงิน** - ตรวจสอบยอด WasteCoin แบบเรียลไทม์
+- 🔐 **กระเป๋าเงินที่ปลอดภัย** - สร้าง Ethereum wallet อัตโนมัติ
+- 📊 **แดชบอร์ดที่ใช้งานง่าย** - ส่วนติดต่อผู้ใช้ที่สะอาดตา แสดงยอดเหรียญ
 
-### For Officers
-- 👥 **User Management** - View all registered users
-- 💰 **Add Coins** - Directly reward users with coins
-- 📈 **Track Activity** - Monitor total users in the system
+### สำหรับเจ้าหน้าที่
+- 👥 **จัดการผู้ใช้** - ดูรายชื่อผู้ใช้ทั้งหมด
+- 💰 **เพิ่มเหรียญ** - มอบเหรียญให้ผู้ใช้โดยตรง
+- 📈 **ติดตามกิจกรรม** - ดูจำนวนผู้ใช้ทั้งหมดในระบบ
 
-## Tech Stack
+## เทคโนโลยีที่ใช้
 
 - **Frontend**: Next.js 16 (React 19, TypeScript)
 - **Backend**: Next.js API Routes
 - **Database**: MongoDB Atlas
 - **Authentication**: JWT (JSON Web Tokens)
-- **Blockchain**: Ethereum (Sepolia Testnet) - Optional
+- **Blockchain**: Ethereum (Sepolia Testnet) - เลือกใช้ได้
 - **Styling**: CSS Modules
 
-## Prerequisites
+## ความต้องการของระบบ
 
-- Node.js 18+ 
-- MongoDB Atlas account
-- npm or yarn
+- Node.js 18 ขึ้นไป
+- บัญชี MongoDB Atlas
+- npm หรือ yarn
 
-## Installation
+## การติดตั้ง
 
-1. **Clone the repository**
-   ```bash
-   git clone <repository-url>
-   cd project1
-   ```
+### 1. Clone repository
+```bash
+git clone https://github.com/Achernar046/project.git
+cd project
+```
 
-2. **Install dependencies**
-   ```bash
-   npm install
-   ```
+### 2. ติดตั้ง dependencies
+```bash
+npm install
+```
 
-3. **Configure environment variables**
-   
-   Copy `.env.example` to `.env.local` and update:
-   ```bash
-   cp .env.example .env.local
-   ```
+### 3. ตั้งค่า environment variables
 
-   Required variables:
-   ```env
-   # MongoDB Atlas
-   MONGODB_URI=mongodb+srv://username:password@cluster.mongodb.net/waste-coin-db?retryWrites=true&w=majority
+คัดลอกไฟล์ `.env.example` ไปเป็น `.env.local`:
+```bash
+cp .env.example .env.local
+```
 
-   # JWT Secret (generate a random string)
-   JWT_SECRET=your-super-secret-jwt-key-change-this
+### 4. สร้าง Secrets ที่ปลอดภัย
+```bash
+npm run generate-secrets
+```
 
-   # Encryption Secret (32-byte hex string)
-   ENCRYPTION_SECRET=0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef
+คัดลอกค่า `JWT_SECRET` และ `ENCRYPTION_SECRET` ที่ได้ไปใส่ในไฟล์ `.env.local`
 
-   # Next.js
-   NEXT_PUBLIC_APP_URL=http://localhost:3000
-   ```
+### 5. ตั้งค่า MongoDB Atlas
 
-4. **Set up MongoDB Atlas**
-   - Create a cluster at [MongoDB Atlas](https://cloud.mongodb.com/)
-   - Create a database user
-   - Add your IP to Network Access (or allow 0.0.0.0/0 for development)
-   - Copy the connection string to `MONGODB_URI`
+1. สร้างคลัสเตอร์ที่ [MongoDB Atlas](https://cloud.mongodb.com/)
+2. สร้าง database user (เช่น username: `waste-coin-db`)
+3. เพิ่ม IP address ของคุณใน Network Access:
+   - ไปที่ **Network Access** > **Add IP Address**
+   - เลือก **Add Current IP Address** หรือ
+   - เลือก **Allow Access from Anywhere** (0.0.0.0/0) สำหรับการพัฒนา
+4. คัดลอก connection string:
+   - ไปที่ **Database** > **Connect** > **Drivers**
+   - เลือก **Node.js** และคัดลอก connection string
+   - แทนที่ `<password>` ด้วยรหัสผ่านที่สร้างไว้
 
-5. **Run the development server**
-   ```bash
-   npm run dev
-   ```
+### 6. อัพเดท `.env.local`
 
-   Open [http://localhost:3000](http://localhost:3000)
+เปิดไฟล์ `.env.local` และกรอกข้อมูล:
 
-## Usage
+```env
+# MongoDB Atlas Connection
+MONGODB_URI=mongodb+srv://waste-coin-db:YOUR_PASSWORD@cluster.mongodb.net/waste-coin-db?retryWrites=true&w=majority
 
-### Register as User
-1. Go to http://localhost:3000/auth
-2. Fill in email and password
-3. Select **"User (Submit Waste)"** role
-4. Click "Create Account"
-5. You'll be redirected to `/dashboard` showing your balance
+# JWT Secret (ได้จาก npm run generate-secrets)
+JWT_SECRET=your-generated-jwt-secret-here
 
-### Register as Officer
-1. Go to http://localhost:3000/auth
-2. Fill in email and password
-3. Select **"Officer (Approve Waste)"** role
-4. Click "Create Account"
-5. You'll be redirected to `/officer` dashboard
+# Encryption Secret (ได้จาก npm run generate-secrets)
+ENCRYPTION_SECRET=your-generated-encryption-secret-here
 
-### Add Coins (Officer Only)
-1. Login as officer
-2. Select a user from the dropdown
-3. Enter coin amount
-4. Click "Add Coins"
-5. User's balance will be updated immediately
+# Next.js
+NEXT_PUBLIC_APP_URL=http://localhost:3000
+```
 
-## Project Structure
+### 7. ตรวจสอบการตั้งค่า
+```bash
+npm run verify-setup
+```
+
+ควรเห็นข้อความ `✅ Setup เรียบร้อย!`
+
+### 8. เริ่มใช้งาน Development Server
+```bash
+npm run dev
+```
+
+เปิดเบราว์เซอร์ไปที่ [http://localhost:3000](http://localhost:3000)
+
+## วิธีการใช้งาน
+
+### สมัครสมาชิกเป็นผู้ใช้ทั่วไป
+1. ไปที่ http://localhost:3000/auth
+2. คลิกแท็บ **Register**
+3. กรอก ID User, ชื่อ, อีเมล และรหัสผ่าน
+4. เลือก Role: **"User (Submit Waste)"**
+5. คลิก "Create Account"
+6. คุณจะถูกนำไปหน้า `/dashboard` ที่แสดงยอดเงิน
+
+### สมัครสมาชิกเป็นเจ้าหน้าที่
+1. ไปที่ http://localhost:3000/auth
+2. คลิกแท็บ **Register**
+3. กรอก ID User, ชื่อ, อีเมล และรหัสผ่าน
+4. เลือก Role: **"Officer (Approve Submissions)"**
+5. คลิก "Create Account"
+6. คุณจะถูกนำไปหน้า `/officer` dashboard
+
+### การเพิ่มเหรียญ (เฉพาะเจ้าหน้าที่)
+1. Login ด้วยบัญชีเจ้าหน้าที่
+2. เลือกผู้ใช้จาก dropdown
+3. กรอกจำนวนเหรียญที่ต้องการมอบ
+4. คลิก "Add Coins"
+5. ยอดเงินของผู้ใช้จะอัพเดททันที
+
+## โครงสร้างโปรเจค
 
 ```
-project1/
+project/
 ├── app/
 │   ├── api/              # API routes
-│   │   ├── auth/         # Authentication endpoints
-│   │   ├── officer/      # Officer-only endpoints
-│   │   ├── users/        # User management
-│   │   └── wallet/       # Balance queries
-│   ├── auth/             # Auth page
-│   ├── dashboard/        # User dashboard
-│   └── officer/          # Officer dashboard
+│   │   ├── auth/         # การยืนยันตัวตน
+│   │   ├── officer/      # Endpoints สำหรับเจ้าหน้าที่
+│   │   ├── users/        # จัดการผู้ใช้
+│   │   └── wallet/       # ตรวจสอบยอดเงิน
+│   ├── auth/             # หน้า Login/Register
+│   ├── dashboard/        # แดชบอร์ดผู้ใช้
+│   └── officer/          # แดชบอร์ดเจ้าหน้าที่
 ├── lib/
-│   ├── auth.ts           # JWT utilities
-│   ├── mongodb.ts        # Database connection
-│   └── wallet.ts         # Wallet generation
+│   ├── auth.ts           # ฟังก์ชัน JWT
+│   ├── mongodb.ts        # เชื่อมต่อฐานข้อมูล
+│   └── wallet.ts         # สร้าง Ethereum wallet
 ├── models/
 │   └── types.ts          # TypeScript interfaces
-└── .env.local            # Environment variables
+├── scripts/
+│   ├── generate-secrets.js        # สร้าง JWT & encryption secrets
+│   ├── verify-setup.js            # ตรวจสอบการติดตั้ง
+│   ├── test-db-connection.js      # ทดสอบ MongoDB connection
+│   ├── test-dns-connection.js     # ทดสอบ DNS resolution
+│   ├── test-direct-connection.js  # ทดสอบการเชื่อมต่อโดยตรง
+│   └── find-replica-set.js        # หา replica set configuration
+└── .env.local            # ตัวแปร environment (ห้าม commit!)
 ```
 
 ## Database Collections
 
 ### `users`
-Stores user accounts with email, password hash, role, and wallet address.
+เก็บข้อมูลบัญชีผู้ใช้ รวมถึงอีเมล, password hash, role และ wallet address
 
 ### `wallets`
-Stores encrypted private keys for user wallets.
+เก็บ private keys ที่เข้ารหัสแล้วสำหรับ wallet ของผู้ใช้
 
 ### `transactions`
-Records all coin transactions (mint, transfer, exchange).
+บันทึกธุรกรรมเหรียญทั้งหมด (mint, transfer, exchange)
+
+### `waste_submissions`
+เก็บข้อมูลการส่งขยะของผู้ใช้
 
 ## API Endpoints
 
-| Method | Endpoint | Auth | Description |
-|--------|----------|------|-------------|
-| POST | `/api/auth/register` | Public | Register new user |
-| POST | `/api/auth/login` | Public | Login user |
-| GET | `/api/wallet/balance` | User | Get coin balance |
-| GET | `/api/users/list` | Officer | Get all users |
-| POST | `/api/officer/add-coins` | Officer | Add coins to user |
+| Method | Endpoint | Auth | คำอธิบาย |
+|--------|----------|------|----------|
+| POST | `/api/auth/register` | Public | สมัครสมาชิกใหม่ |
+| POST | `/api/auth/login` | Public | เข้าสู่ระบบ |
+| GET | `/api/wallet/balance` | User | ดูยอดเหรียญ |
+| GET | `/api/users/list` | Officer | ดูรายชื่อผู้ใช้ทั้งหมด |
+| POST | `/api/officer/add-coins` | Officer | เพิ่มเหรียญให้ผู้ใช้ |
 
-## Security Features
+## ความปลอดภัย
 
-- ✅ Password hashing with bcrypt
-- ✅ JWT-based authentication
-- ✅ Role-based access control
-- ✅ Encrypted private key storage
-- ✅ Input validation
-- ✅ MongoDB injection protection
+- ✅ เข้ารหัสรหัสผ่านด้วย bcrypt
+- ✅ ใช้ JWT สำหรับการยืนยันตัวตน
+- ✅ จำกัดสิทธิ์ตาม Role
+- ✅ เข้ารหัส Private Key ก่อนเก็บ
+- ✅ ตรวจสอบข้อมูลนำเข้า
+- ✅ ป้องกัน MongoDB injection
 
-## Development
+## การพัฒนา
 
-### Run development server
+### รัน development server
 ```bash
 npm run dev
 ```
 
-### Build for production
+### Build สำหรับ production
 ```bash
 npm run build
 npm start
 ```
 
-### Lint code
+### ตรวจสอบ code
 ```bash
 npm run lint
 ```
 
-## Troubleshooting
+## แก้ปัญหาที่พบบ่อย
 
-### MongoDB Connection Error
-- Check your MongoDB Atlas credentials
-- Verify IP whitelist in Network Access
-- Ensure connection string includes database name
+### ⚠️ MongoDB Connection Error (สำคัญ!)
 
-### Balance Not Updating
-- Refresh the page
-- Check if transaction was created in MongoDB
-- Verify officer added coins successfully
+#### ปัญหา: DNS Resolution Failed
+```
+Error: querySrv ECONNREFUSED _mongodb._tcp.xxxxx.mongodb.net
+```
 
-### Authentication Issues
-- Clear localStorage and login again
-- Check JWT_SECRET in `.env.local`
-- Verify token expiration
+**สาเหตุ**: Windows DNS ไม่สามารถ resolve MongoDB SRV records ได้
 
-## Future Enhancements
+**วิธีแก้ปัญหา**:
 
-- [ ] Deploy smart contract to Sepolia testnet
-- [ ] Integrate blockchain transactions
-- [ ] Add transaction history page
-- [ ] Implement coin transfer between users
-- [ ] Add email notifications
-- [ ] Create admin panel for system management
+**วิธีที่ 1: ใช้ Standard MongoDB Connection Format** (แนะนำ)
+
+1. เปิด MongoDB Atlas > เลือก cluster > คลิก **Connect**
+2. เลือก **Drivers** > **Node.js**
+3. คลิก **View Full Code Sample**
+4. คัดลอก connection string ที่เป็นรูปแบบ `mongodb://` (ไม่ใช่ `mongodb+srv://`)
+5. Connection string จะเป็นแบบนี้:
+   ```
+   mongodb://username:password@host1:27017,host2:27017,host3:27017/database?ssl=true&authSource=admin&retryWrites=true&w=majority
+   ```
+6. อัพเดทใน `.env.local`:
+   ```env
+   MONGODB_URI=mongodb://waste-coin-db:YOUR_PASSWORD@host1:27017,host2:27017,host3:27017/waste-coin-db?ssl=true&authSource=admin&retryWrites=true&w=majority
+   ```
+
+**วิธีที่ 2: ใช้ Diagnostic Script**
+
+รันคำสั่งนี้เพื่อหา connection string ที่ถูกต้อง:
+```bash
+node scripts/find-replica-set.js
+```
+
+Script จะแสดง working connection string ที่คุณสามารถใช้ได้
+
+#### ปัญหา: IP Address ไม่ได้ถูก Whitelist
+
+**วิธีแก้**:
+1. เข้า MongoDB Atlas
+2. ไปที่ **Network Access** (เมนูด้านซ้าย)
+3. คลิก **Add IP Address**
+4. เลือก:
+   - **Add Current IP Address** (สำหรับ IP ปัจจุบัน) หรือ
+   - **Allow Access from Anywhere** (0.0.0.0/0) สำหรับการพัฒนา
+5. คลิก **Confirm**
+6. รอ 1-2 นาทีให้การตั้งค่ามีผล
+
+#### ทดสอบการเชื่อมต่อ
+
+```bash
+npm run test-connection
+# หรือ
+node scripts/test-db-connection.js
+```
+
+ควรเห็นข้อความ:
+```
+✅ Successfully connected to MongoDB!
+✅ Database operations working correctly!
+```
+
+### ยอดเงินไม่อัพเดท
+
+- รีเฟรชหน้าเว็บ
+- ตรวจสอบว่ามีธุรกรรมถูกสร้างใน MongoDB หรือไม่
+- ตรวจสอบว่าเจ้าหน้าที่เพิ่มเหรียญสำเร็จหรือไม่
+
+### ปัญหาการยืนยันตัวตน
+
+- ล้าง localStorage และ login ใหม่
+- ตรวจสอบ `JWT_SECRET` ในไฟล์ `.env.local`
+- ตรวจสอบว่า token หมดอายุหรือไม่
+
+### Internal Server Error ตอนสมัครสมาชิก
+
+1. ตรวจสอบ MongoDB connection:
+   ```bash
+   node scripts/test-db-connection.js
+   ```
+2. ตรวจสอบว่าตั้งค่า `JWT_SECRET` และ `ENCRYPTION_SECRET` แล้ว
+3. ตรวจสอบ console log ใน terminal
+
+## Scripts ที่มีให้ใช้
+
+| คำสั่ง | คำอธิบาย |
+|--------|----------|
+| `npm run dev` | รัน development server |
+| `npm run build` | Build สำหรับ production |
+| `npm run start` | รัน production server |
+| `npm run lint` | ตรวจสอบ code style |
+| `npm run generate-secrets` | สร้าง JWT และ encryption secrets |
+| `npm run verify-setup` | ตรวจสอบการติดตั้งทั้งหมด |
+
+## การพัฒนาต่อในอนาคต
+
+- [ ] Deploy smart contract ไปยัง Sepolia testnet
+- [ ] เชื่อมต่อธุรกรรมกับ blockchain จริง
+- [ ] เพิ่มหน้าประวัติธุรกรรม
+- [ ] ระบบโอนเหรียญระหว่างผู้ใช้
+- [ ] แจ้งเตือนทางอีเมล
+- [ ] Admin panel สำหรับจัดการระบบ
 
 ## License
 
 MIT
 
-## Support
+## การสนับสนุน
 
-For issues or questions, please open an issue in the repository.
+หากพบปัญหาหรือมีคำถาม กรุณาเปิด issue ใน repository นี้
 
 ---
 
-**Built with ❤️ using Next.js and MongoDB**
+**สร้างด้วย ❤️ โดยใช้ Next.js และ MongoDB**
