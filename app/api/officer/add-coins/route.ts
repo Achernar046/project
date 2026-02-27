@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getDatabase } from '@/lib/mongodb';
 import { verifyToken } from '@/lib/auth';
+import { mintCoins } from '@/lib/blockchain';
 import { Transaction } from '@/models/types';
 import { ObjectId } from 'mongodb';
 
@@ -33,16 +34,17 @@ export async function POST(request: NextRequest) {
         }
 
         const { user_id, amount } = await request.json();
+        const numericAmount = Number(amount);
 
         // Validate input
-        if (!user_id || !amount) {
+        if (!user_id || !numericAmount) {
             return NextResponse.json(
                 { error: 'User ID and amount are required' },
                 { status: 400 }
             );
         }
 
-        if (amount <= 0) {
+        if (!Number.isFinite(numericAmount) || numericAmount <= 0) {
             return NextResponse.json(
                 { error: 'Amount must be greater than 0' },
                 { status: 400 }
@@ -63,13 +65,19 @@ export async function POST(request: NextRequest) {
             );
         }
 
+        const { txHash } = await mintCoins(
+            user.wallet_address,
+            numericAmount,
+            `Officer manual mint by ${decoded.email}`
+        );
+
         // Create transaction record
         const transaction: Transaction = {
             user_id: new ObjectId(user_id),
             type: 'mint',
-            amount: amount,
+            amount: numericAmount,
             to_address: user.wallet_address,
-            blockchain_tx_hash: `DB-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`, // Temporary hash for database-only version
+            blockchain_tx_hash: txHash,
             status: 'confirmed',
             created_at: new Date(),
         };
@@ -81,9 +89,10 @@ export async function POST(request: NextRequest) {
                 message: 'Coins added successfully',
                 transaction: {
                     id: result.insertedId.toString(),
-                    amount: amount,
+                    amount: numericAmount,
                     user: user.email,
                     walletAddress: user.wallet_address,
+                    txHash,
                 },
             },
             { status: 201 }

@@ -1,5 +1,9 @@
 import { ethers } from 'ethers';
 import crypto from 'crypto';
+import { getDatabase } from './mongodb';
+import { getProvider } from './blockchain';
+import { ObjectId } from 'mongodb';
+import { Wallet as WalletDoc } from '@/models/types';
 
 const ENCRYPTION_SECRET = process.env.ENCRYPTION_SECRET || 'default-secret-change-this';
 const ALGORITHM = 'aes-256-cbc';
@@ -72,3 +76,27 @@ export function getWalletFromEncrypted(
     const privateKey = decryptPrivateKey(encryptedKey, iv);
     return new ethers.Wallet(privateKey);
 }
+
+/**
+ * Get a user's wallet signer from the DB (connected to Sepolia provider)
+ * This is the core custodial function — decrypts the key and returns a live signer.
+ */
+export async function getUserWalletSigner(userId: string): Promise<ethers.Wallet> {
+    const db = await getDatabase();
+    const walletDoc = await db.collection<WalletDoc>('wallets').findOne({
+        user_id: new ObjectId(userId),
+    });
+
+    if (!walletDoc) {
+        throw new Error('Wallet not found for user');
+    }
+
+    const privateKey = decryptPrivateKey(
+        walletDoc.encrypted_private_key,
+        walletDoc.encryption_iv
+    );
+
+    const provider = getProvider();
+    return new ethers.Wallet(privateKey, provider);
+}
+
